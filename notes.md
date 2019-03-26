@@ -13,17 +13,22 @@ The parameters that you will need to pass are:
 
 * _object: This basically addresses the logical object in Monyog that you want to direct your request to.The only acceptable value is MONyogAPI.
 * _action: This specifies the part of the object specified above that you want to direct your request to. The acceptable values are:
-* Alerts
-* DataCollection
-* Sniffer
-* LongRunningQueries
-* LockedQueries
-* LongRunningQueryAction
-* AddServer
-* EditServer
-* RemoveServer
+  * Alerts
+  * DataCollection
+  * Sniffer
+  * LongRunningQueries
+  * LockedQueries
+  * LongRunningQueryAction
+  * AddServer
+  * EditServer
+  * RemoveServer
 * _value: The operation that you want to perform for the action specified in the _action field. Acceptable values include for:
-  * Alerts, DataCollection, Sniffer, LongRunningQueries, LockedQueries: enable and disable
+  * Alerts
+  * DataCollection
+  * Sniffer
+  * LongRunningQueries
+  * LockedQueries:
+    * enable and disable
 * LongRunningQueryAction: notify, kill and notifyandkill
 * _user: It may be Monyog user, LDAP user or LDAP Group user. In case, no user is supplied, admin account is used by default.
 * _password: The password for the specified _user.
@@ -112,7 +117,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Add Server
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver &_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production &_server=Test&_mysqlpassword=msandbox&_connectontype=direct &_user=admin&_password=Password"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectontype=direct &_user=admin&_password=Password"```
 
 ### Add Server with SSH Tunnel
 
@@ -120,7 +125,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Edit Server
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver &_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306 &_tags=Production&_server=Test&_mysqlpassword=msandbox &_connectontype=direct&_user=admin&_password=Password"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306 &_tags=Production&_server=Test&_mysqlpassword=msandbox &_connectontype=direct&_user=admin&_password=Password"```
 
 
 ### Delete Server
@@ -135,7 +140,7 @@ In summary, the various URLs that you can use with curl:
 
 ```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=removeserver&_server=Server1,Server2”```
 
-### Return Codes
+## Return Codes
 
 Assuming that the connection to SQL DM for MySQL was successful, it returns a text message. The message is in the JSON format:
 

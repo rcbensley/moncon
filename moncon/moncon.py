@@ -1,17 +1,73 @@
 import os
 import sys
-import urllib
+import json
 import argparse
 import configparser
+import requests
 
-MONYOG_KEYS = ('url',
-               'port',
-               '_user',
-               '_password')
+MONYOG_BOOL_ACTIONS = (
+    'alerts',
+    'datacollection',
+    'sniffer',
+    'longrunningqueries',
+    'lockedqueries')
+
+MONYOG_LONG_ACTIONS = (
+    'longrunningqueryaction')
 
 
 def cli_args():
-    return
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', default=5555)
+    parser.add_argument('--user')
+    parser.add_argument('--password')
+
+    parser.add_argument('--server')
+    parser.add_argument('--tags')
+
+    subparsers = parser.add_subparsers()
+
+    # Enable/Disable actions
+    bool_parser = subparsers.add_parser(
+            'enable_disable')
+    bool_parser.add_argument(
+        'action', choices=MONYOG_BOOL_ACTIONS)
+    bool_parser.add_argument(
+        'value', choices=('enable', 'disable'))
+
+    # Long Running Query Actions
+    long_parser = subparsers.add_parser(
+            'long_running')
+    long_parser.add_argument(
+            'action', choices=MONYOG_LONG_ACTIONS)
+    long_parser.add_argument(
+            'value', choices=('notify', 'kill', 'notifyandkill'))
+
+    args = parser.parse_args()
+
+    cfg = {
+        'host': str(args.url),
+        'port': str(args.port),
+        '_action': args.action,
+        '_value': args.value}
+
+    if args.server and args.tag:
+        print("Choose only one of --server or --tag")
+        sys.exit(2)
+    else:
+        if args.server:
+            cfg['target'] = '_server={}'.format(args.server)
+        elif args.tags:
+            cfg['target'] = '_tags={}'.format(args.tags)
+
+        if args.password:
+            cfg['_password'] = str(args.password)
+        if args.user:
+            cfg['_user'] = str(args.user)
+
+        print(**cfg)
+        return cfg
 
 
 def my_cnf():
@@ -36,18 +92,11 @@ def system_cnf():
         return False
 
 
-def read_config(cnf_path, section='monyog', keys=MONYOG_KEYS):
+def read_config(cnf_path, section='monyog'):
     cfg = configparser.ConfigParser()
     cfg.read(cnf_path)
     if section in cfg.sections:
-        missing_keys = False
-        for k in keys:
-            if k not in cfg[section]:
-                missing_keys = True
-        if missing_keys is True:
-            return False
-        else:
-            return cfg[section]
+        return cfg[section]
     else:
         return False
 
@@ -65,27 +114,49 @@ def read_configs(section='monyog'):
                 return i
     else:
         sys_paths = ', '.join(system_cnf_files)
-        sys.exit("No {s} found in {m} or any of: {c}".format(s=section,
-                                                             m=my_cnf_file,
-                                                             c=sys_paths))
+        sys.exit("No {s} found in {m} or any of: {c}".format(
+            s=section,
+            m=my_cnf_file,
+            c=sys_paths))
 
 
-def monyong_cmd(cfg: dict, operation: str):
-    def fmt_cmd(d, k):
-        s = "{k}={v}".format(**d)
-        return s
+def monyog_cfg(cfg: dict = cli_args()):
+    file_cfg = read_configs()
+    cli_cfg = cfg.copy()
+    cfg = dict()
 
-    def join_cmd(d, keys):
-        cmds = []
-        for i in keys:
-            cmds.append(fmt_cmd(d, i))
-        joined_cmd = '&'.join(cmds)
-        return joined_cmd
+    if file_cfg():
+        cfg.update(file_cfg)
 
-    monyog_cfg = cfg.copy()
-    monyog_cfg['_object'] = 'MONyogAPI'
-    monyog_cfg['object'] = fmt_cmd(monyog_cfg, '_object')
+    if cli_cfg:
+        cfg.update(cli_cfg)
 
-    url_template = "http://{url}:{port}/?{object}{cmd}"
-    fmt_url = url_template.format(**monyog_cfg)
-    return fmt_url
+    cfg['_object'] = 'MONyogAPI'
+
+    url_template = (
+        "http://{host}:{port}/"
+        "?_object={_object}"
+        "&_action={_action}"
+        "&_value={_value}"
+        "{target}")
+
+    fmt_url = url_template.format(**cfg)
+    cfg['url'] = fmt_url
+    print(cfg)
+    return cfg
+
+
+def monyog_cmd(cfg: dict = monyog_cfg()):
+    r = requests.get(cfg['url'])
+    return r.json()
+
+
+def check_status(status):
+    s = json.load(status)
+    print(s)
+
+
+def main():
+    cli_args()
+    # monyog_cfg()
+
