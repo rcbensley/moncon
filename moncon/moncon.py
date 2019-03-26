@@ -61,8 +61,8 @@ def cli_args():
         bomb("{} is not a valid value for {}".format(
             args.value, args.value))
     else:
-        cfg['_action'] = args.action
-        cfg['_value'] = args.value
+        cfg['action'] = args.action
+        cfg['value'] = args.value
 
     if args.server and args.tags:
         bomb("Choose only one of --server or --tags")
@@ -75,9 +75,9 @@ def cli_args():
         bomb("Need at least one of --server or --tags")
 
     if args.password:
-        cfg['_password'] = str(args.password)
+        cfg['password'] = str(args.password)
     if args.user:
-        cfg['_user'] = str(args.user)
+        cfg['user'] = str(args.user)
 
     return cfg
 
@@ -114,15 +114,6 @@ def read_config(cnf_path, section='monyog'):
 
 
 def read_configs(section='monyog'):
-    def fmt_cfg(cfg: dict):
-        f = cfg.copy()
-        if 'user' in f:
-            f['_user'] = f['user']
-            f.pop('user', None)
-        if 'password' in f:
-            f['_password'] = f['password']
-            f.pop('password', None)
-        return f
     my_cnf_file = my_cnf()
     system_cnf_files = system_cnf()
     if my_cnf_file:
@@ -141,7 +132,6 @@ def read_configs(section='monyog'):
             m=my_cnf_file,
             c=sys_paths))
 
-    cfg = fmt_cfg(cfg)
     return cfg
 
 
@@ -156,13 +146,15 @@ def monyog_cfg(cfg: dict = cli_args()):
     if cli_cfg:
         cfg.update(cli_cfg)
 
-    cfg['_object'] = 'MONyogAPI'
+    cfg['object'] = 'MONyogAPI'
 
     url_template = (
         "http://{host}:{port}/"
-        "?_object={_object}"
-        "&_action={_action}"
-        "&_value={_value}"
+        "?_object={object}"
+        "&_action={action}"
+        "&_value={value}"
+        "&_user={user}"
+        "&_password={password}"
         "&{target}")
 
     fmt_url = url_template.format(**cfg)
