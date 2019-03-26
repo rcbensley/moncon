@@ -8,12 +8,18 @@ You can store paramters such as host, port, user, and password in the "[monyog]"
  * /etc/my.cnf
  * (more to come)
 
- Example:
- ```$ moncon --action=alerts --value disable --server=db1 ```
+### Install:
+NOT YET AVAILABLE!
+```pip install moncon```
 
- Note, no password or user is supplied. Appending '--dry-run' we will see the details read from a config file:
- ```
-$ moncon --action=alerts --value disable --server=db1 --dry-run
+###  Example
+
+Disable alerts for server named db1:
+
+```$ moncon --action=alerts --value disable --server=db1```
+
+Note, no password or user is supplied. Appending '--dry-run' we will see the details read from a config file:
+``` $ moncon --action=alerts --value disable --server=db1 --dry-run
 {'_action': 'alerts',
  '_object': 'MONyogAPI',
  '_value': 'disable',
@@ -23,12 +29,10 @@ $ moncon --action=alerts --value disable --server=db1 --dry-run
  'port': '5555',
  'target': '_server=db1',
  'url': 'http://127.0.0.1:5555/?_object=MONyogAPI&_action=alerts&_value=disable_server=db1',
- 'user': 'admin_user_in_file'}
- ```
+ 'user': 'admin_user_in_file'}```
 
- However we can override some details like the password if needed:
-```
-moncon --action=alerts --value disable --server=db1 --password SuperSecret --dry-run
+However we can override some details like the password if needed:
+``` moncon --action=alerts --value disable --server=db1 --password SuperSecret --dry-run
 {'_action': 'alerts',
  '_object': 'MONyogAPI',
  '_password': 'SuperSecret',
