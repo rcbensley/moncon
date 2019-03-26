@@ -23,7 +23,7 @@ The parameters that you will need to pass are:
 * EditServer
 * RemoveServer
 * _value: The operation that you want to perform for the action specified in the _action field. Acceptable values include for:
-** Alerts, DataCollection, Sniffer, LongRunningQueries, LockedQueries: enable and disable
+  * Alerts, DataCollection, Sniffer, LongRunningQueries, LockedQueries: enable and disable
 * LongRunningQueryAction: notify, kill and notifyandkill
 * _user: It may be Monyog user, LDAP user or LDAP Group user. In case, no user is supplied, admin account is used by default.
 * _password: The password for the specified _user.
@@ -37,7 +37,7 @@ To manage servers in Monyog via API, the following parameters need to be passed:
 
 * _server: The name or data directory number of the server to be registered
 * _mysqlhost: MySQL host/ip address
-* * * * * * * * * _mysqluser: MySQL user name
+* _mysqluser: MySQL user name
 * _mysqlport: MySQL port
 * _mysqlpassword: MySQL user password
 
@@ -116,7 +116,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Add Server with SSH Tunnel
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectiontype=ssh&_sshhost=192.168.1.86&_sshuser=username&_sshpassword=sshpassword&_sshport=22&_user=admin&_password=Password"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectiontype=ssh&_sshhost=192.168.1.86&_sshuser=username&_sshpassword=sshpassword&_sshport=22&_user=admin&_password=Password"``` 
 
 ### Edit Server
 
