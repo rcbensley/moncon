@@ -120,7 +120,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Edit Server
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver &_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306 &_tags=Production&_server=Test&_mysqlpassword=msandbox &_connectontype=direct&_user=admin&_password=Password"
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver &_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306 &_tags=Production&_server=Test&_mysqlpassword=msandbox &_connectontype=direct&_user=admin&_password=Password"```
 
 
 ### Delete Server
