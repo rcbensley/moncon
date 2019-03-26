@@ -3,17 +3,34 @@ import sys
 import json
 import argparse
 import configparser
+from pprint import pprint
 import requests
 
-MONYOG_BOOL_ACTIONS = (
+ACTIONS_BOOL = (
     'alerts',
     'datacollection',
     'sniffer',
     'longrunningqueries',
     'lockedqueries')
 
-MONYOG_LONG_ACTIONS = (
-    'longrunningqueryaction')
+VALUES_BOOL = (
+    'enable',
+    'disable')
+
+ACTIONS_LONG = (
+    'longrunningqueryaction',)
+
+VALUES_LONG = (
+    'notify',
+    'kill',
+    'notifyandkill')
+
+ACTIONS_ALL = list(ACTIONS_BOOL) + list(ACTIONS_LONG)
+
+
+def bomb(msg, x=2):
+    print(msg)
+    sys.exit(x)
 
 
 def cli_args():
@@ -22,52 +39,47 @@ def cli_args():
     parser.add_argument('--port', default=5555)
     parser.add_argument('--user')
     parser.add_argument('--password')
-
     parser.add_argument('--server')
     parser.add_argument('--tags')
-
-    subparsers = parser.add_subparsers()
-
-    # Enable/Disable actions
-    bool_parser = subparsers.add_parser(
-            'enable_disable')
-    bool_parser.add_argument(
-        'action', choices=MONYOG_BOOL_ACTIONS)
-    bool_parser.add_argument(
-        'value', choices=('enable', 'disable'))
-
-    # Long Running Query Actions
-    long_parser = subparsers.add_parser(
-            'long_running')
-    long_parser.add_argument(
-            'action', choices=MONYOG_LONG_ACTIONS)
-    long_parser.add_argument(
-            'value', choices=('notify', 'kill', 'notifyandkill'))
-
+    parser.add_argument('--action', required=True)
+    parser.add_argument('--value', required=True)
+    parser.add_argument('--dry-run', action='store_true', default=False)
     args = parser.parse_args()
 
     cfg = {
-        'host': str(args.url),
+        'host': str(args.host),
         'port': str(args.port),
-        '_action': args.action,
-        '_value': args.value}
+        'dry_run': args.dry_run}
 
-    if args.server and args.tag:
-        print("Choose only one of --server or --tag")
-        sys.exit(2)
+    if args.action not in ACTIONS_ALL:
+        bomb("Action must be one of {} {}".format(
+            ', '.join(ACTIONS_ALL)))
+    elif args.action in ACTIONS_BOOL and args.value not in VALUES_BOOL:
+        bomb("{} is not a valid value for {}".format(
+            args.value, args.value))
+    elif args.action in ACTIONS_LONG and args.value not in VALUES_LONG:
+        bomb("{} is not a valid value for {}".format(
+            args.value, args.value))
     else:
-        if args.server:
-            cfg['target'] = '_server={}'.format(args.server)
-        elif args.tags:
-            cfg['target'] = '_tags={}'.format(args.tags)
+        cfg['_action'] = args.action
+        cfg['_value'] = args.value
 
-        if args.password:
-            cfg['_password'] = str(args.password)
-        if args.user:
-            cfg['_user'] = str(args.user)
+    if args.server and args.tags:
+        bomb("Choose only one of --server or --tags")
 
-        print(**cfg)
-        return cfg
+    if args.server:
+        cfg['target'] = '_server={}'.format(args.server)
+    elif args.tags:
+        cfg['target'] = '_tags={}'.format(args.tags)
+    else:
+        bomb("Need at least one of --server or --tags")
+
+    if args.password:
+        cfg['_password'] = str(args.password)
+    if args.user:
+        cfg['_user'] = str(args.user)
+
+    return cfg
 
 
 def my_cnf():
@@ -93,9 +105,9 @@ def system_cnf():
 
 
 def read_config(cnf_path, section='monyog'):
-    cfg = configparser.ConfigParser()
+    cfg = configparser.ConfigParser(allow_no_value=True)
     cfg.read(cnf_path)
-    if section in cfg.sections:
+    if section in cfg.sections():
         return cfg[section]
     else:
         return False
@@ -125,7 +137,7 @@ def monyog_cfg(cfg: dict = cli_args()):
     cli_cfg = cfg.copy()
     cfg = dict()
 
-    if file_cfg():
+    if file_cfg:
         cfg.update(file_cfg)
 
     if cli_cfg:
@@ -142,21 +154,22 @@ def monyog_cfg(cfg: dict = cli_args()):
 
     fmt_url = url_template.format(**cfg)
     cfg['url'] = fmt_url
-    print(cfg)
     return cfg
 
 
 def monyog_cmd(cfg: dict = monyog_cfg()):
-    r = requests.get(cfg['url'])
-    return r.json()
+    if cfg['dry_run']:
+        pprint(cfg)
+        return
+    else:
+        r = requests.get(cfg['url'])
+        return r.json()
 
 
 def check_status(status):
     s = json.load(status)
-    print(s)
+    return s
 
 
 def main():
-    cli_args()
-    # monyog_cfg()
-
+    monyog_cmd()
