@@ -21,31 +21,31 @@ Disable alerts for server named db1:
 
 Note, no password or user is supplied. Appending '--dry-run' we will see the details read from a config file:
 ```
-$ moncon --action=alerts --value disable --server=db1 --dry-run
-{'_action': 'alerts',
- '_object': 'MONyogAPI',
- '_value': 'disable',
+$ ./scripts/moncon --action=alerts --value disable --server=db1 --dry-run
+{'action': 'alerts',
  'dry_run': True,
  'host': '127.0.0.1',
+ 'object': 'MONyogAPI',
  'password': 'password123_from_file',
  'port': '5555',
  'target': '_server=db1',
- 'url': 'http://127.0.0.1:5555/?_object=MONyogAPI&_action=alerts&_value=disable_server=db1',
- 'user': 'admin_user_in_file'}
+ 'url': 'http://127.0.0.1:5555/?_object=MONyogAPI&_action=alerts&_value=disable&_user=admin_user_in_file&_password=password123_from_file&_server=db1',
+ 'user': 'admin_user_in_file',
+ 'value': 'disable'}
 ```
 
 However we can override some details like the password if needed:
 
 ```
-$ moncon --action=alerts --value disable --server=db1 --password SuperSecret --dry-run
-{'_action': 'alerts',
- '_object': 'MONyogAPI',
- '_password': 'SuperSecret',
- '_user': 'admin_user_in_file',
- '_value': 'disable',
+$ ./scripts/moncon --action=alerts --value disable --server=db1 --password SuperSecret --dry-run
+{'action': 'alerts',
  'dry_run': True,
  'host': '127.0.0.1',
+ 'object': 'MONyogAPI',
+ 'password': 'SuperSecret',
  'port': '5555',
  'target': '_server=db1',
- 'url': 'http://127.0.0.1:5555/?_object=MONyogAPI&_action=alerts&_value=disable_server=db1'}
+ 'url': 'http://127.0.0.1:5555/?_object=MONyogAPI&_action=alerts&_value=disable&_user=admin_user_in_file&_password=SuperSecret&_server=db1',
+ 'user': 'admin_user_in_file',
+ 'value': 'disable'}
 ```
