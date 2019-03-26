@@ -1,6 +1,6 @@
 Markdown version of: http://wiki.idera.com/plugins/servlet/mobile?contentId=100073639#content/view/101056950
 
---
+-
 
 You can access the API by passing parameters to Monyog through its base URL.
 For example, if Monyog is running on a system with IP 192.168.1.1, then the parameters need to be passed to: http://192.168.1.1:5555/
