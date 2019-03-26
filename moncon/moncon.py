@@ -108,28 +108,41 @@ def read_config(cnf_path, section='monyog'):
     cfg = configparser.ConfigParser(allow_no_value=True)
     cfg.read(cnf_path)
     if section in cfg.sections():
-        return cfg[section]
+        return dict(cfg[section])
     else:
         return False
 
 
 def read_configs(section='monyog'):
+    def fmt_cfg(cfg: dict):
+        f = cfg.copy()
+        if 'user' in f:
+            f['_user'] = f['user']
+            f.pop('user', None)
+        if 'password' in f:
+            f['_password'] = f['password']
+            f.pop('password', None)
+        return f
     my_cnf_file = my_cnf()
     system_cnf_files = system_cnf()
     if my_cnf_file:
-        return read_config(my_cnf_file, section)
+        cfg = read_config(my_cnf_file, section)
     elif system_cnf_files:
         #  Read files in paths in a linear order.
         #  Break as soon as we find valid monyog details.
         for i in system_cnf_files:
             if read_config(i, section):
-                return i
+                cfg = i
+                break
     else:
         sys_paths = ', '.join(system_cnf_files)
         sys.exit("No {s} found in {m} or any of: {c}".format(
             s=section,
             m=my_cnf_file,
             c=sys_paths))
+
+    cfg = fmt_cfg(cfg)
+    return cfg
 
 
 def monyog_cfg(cfg: dict = cli_args()):
