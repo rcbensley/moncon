@@ -163,7 +163,7 @@ def monyog_cfg(cfg: dict = cli_args()):
         "?_object={_object}"
         "&_action={_action}"
         "&_value={_value}"
-        "{target}")
+        "&{target}")
 
     fmt_url = url_template.format(**cfg)
     cfg['url'] = fmt_url
