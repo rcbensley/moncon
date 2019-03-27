@@ -6,26 +6,54 @@ import configparser
 from pprint import pprint
 import requests
 
-ACTIONS_BOOL = (
-    'alerts',
-    'datacollection',
-    'sniffer',
-    'longrunningqueries',
-    'lockedqueries')
+OPTS = {
+    'booleans': {
+        'actions': (
+            'alerts',
+            'datacollection',
+            'sniffer',
+            'longrunningqueries',
+            'lockedqueries'
+        ),
+        'values': (
+            'enable',
+            'disable'
+        )
+    },
+    'longquery': {
+        'actions': (
+            'longrunningqueryaction',
+        ),
+        'values': (
+            'notify',
+            'kill',
+            'notifyandkill'
+        )
+    }
 
-VALUES_BOOL = (
-    'enable',
-    'disable')
+}
 
-ACTIONS_LONG = (
-    'longrunningqueryaction',)
 
-VALUES_LONG = (
-    'notify',
-    'kill',
-    'notifyandkill')
+def get_opt(s, k, d=OPTS):
+    return d[s][k]
 
-ACTIONS_ALL = list(ACTIONS_BOOL) + list(ACTIONS_LONG)
+
+def get_actions(s, d=OPTS):
+    return d[s]['actions']
+
+
+def get_values(s, d=OPTS):
+    return d[s]['values']
+
+
+def check_action_value(s, a, v, d=OPTS):
+    if a in get_actions(s, d):
+        if v in get_values(s, d):
+            return True
+        else:
+            bomb("{} is not a valid value for {}".format(a, v))
+    else:
+        return False
 
 
 def bomb(msg, x=2):
@@ -51,15 +79,10 @@ def cli_args():
         'port': str(args.port),
         'dry_run': args.dry_run}
 
-    if args.action not in ACTIONS_ALL:
-        bomb("Action must be one of {} {}".format(
-            ', '.join(ACTIONS_ALL)))
-    elif args.action in ACTIONS_BOOL and args.value not in VALUES_BOOL:
-        bomb("{} is not a valid value for {}".format(
-            args.value, args.value))
-    elif args.action in ACTIONS_LONG and args.value not in VALUES_LONG:
-        bomb("{} is not a valid value for {}".format(
-            args.value, args.value))
+    if not check_action_value('booleans', args.action, args.value, OPTS):
+        pass
+    elif not check_action_value('longquery', args.action, args.value, OPTS):
+        pass
     else:
         cfg['action'] = args.action
         cfg['value'] = args.value
@@ -91,7 +114,8 @@ def my_cnf():
 
 
 def system_cnf():
-    paths = ('/etc/my.cnf',
+    paths = ('/usr/local/MONyog/MONyog.ini',
+             '/etc/my.cnf',
              '/etc/my.cnf.d/mariadb.cnf')
     found_files = []
     for i in paths:
@@ -168,12 +192,14 @@ def monyog_cmd(cfg: dict = monyog_cfg()):
         return
     else:
         r = requests.get(cfg['url'])
-        return r.json()
+        check_status(r.json())
+        return
 
 
 def check_status(status):
-    s = json.load(status)
-    return s
+    print(status)
+    print(type(status))
+    return status
 
 
 def main():

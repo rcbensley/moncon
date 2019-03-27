@@ -49,7 +49,7 @@ To manage servers in Monyog via API, the following parameters need to be passed:
 
 ### For example, to add a server:
 
-```curl "192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_user=admin &_server=Production&_mysqlhost=127.0.0.1&_mysqluser=admin &_mysqlport=3306&_mysqlpassword=adminpassword"```
+```curl "192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_user=admin&_server=Production&_mysqlhost=127.0.0.1&_mysqluser=admin&_mysqlport=3306&_mysqlpassword=adminpassword"```
 
 Additional parameters for registering servers are listed here.
 
@@ -77,7 +77,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Stops data collection for <tag>
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=DataCollection &_value=disable&_user=admin&_password=Password&_tag=Production"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=DataCollection&_value=disable&_user=admin&_password=Password&_tag=Production"```
 
 ### Stops data collection globally for all the servers (Maintenance)
 
@@ -117,7 +117,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Add Server
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectontype=direct &_user=admin&_password=Password"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=addserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectontype=direct&_user=admin&_password=Password"```
 
 ### Add Server with SSH Tunnel
 
@@ -125,7 +125,7 @@ In summary, the various URLs that you can use with curl:
 
 ### Edit Server
 
-```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306 &_tags=Production&_server=Test&_mysqlpassword=msandbox &_connectontype=direct&_user=admin&_password=Password"```
+```curl "http://192.168.1.1:5555/?_object=MONyogAPI&_action=editserver&_mysqluser=msandbox&_mysqlhost=127.0.0.1&_mysqlport=3306&_tags=Production&_server=Test&_mysqlpassword=msandbox&_connectontype=direct&_user=admin&_password=Password"```
 
 
 ### Delete Server
