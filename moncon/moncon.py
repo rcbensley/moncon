@@ -30,7 +30,6 @@ OPTS = {
             'notifyandkill'
         )
     }
-
 }
 
 
@@ -56,7 +55,7 @@ def check_action_value(s, a, v, d=OPTS):
         return False
 
 
-def bomb(msg, x=2):
+def bomb(msg, x=1):
     print(msg)
     sys.exit(x)
 
@@ -79,13 +78,14 @@ def cli_args():
         'port': str(args.port),
         'dry_run': args.dry_run}
 
-    if not check_action_value('booleans', args.action, args.value, OPTS):
-        pass
-    elif not check_action_value('longquery', args.action, args.value, OPTS):
-        pass
-    else:
+    if check_action_value('booleans', args.action, args.value, OPTS):
         cfg['action'] = args.action
         cfg['value'] = args.value
+    elif check_action_value('longquery', args.action, args.value, OPTS):
+        cfg['action'] = args.action
+        cfg['value'] = args.value
+    else:
+        bomb("Unrecognised action and value")
 
     if args.server and args.tags:
         bomb("Choose only one of --server or --tags")
@@ -197,9 +197,10 @@ def monyog_cmd(cfg: dict = monyog_cfg()):
 
 
 def check_status(status):
-    print(status)
-    print(type(status))
-    return status
+    if status['STATUS'] == 'FALIURE':
+        bomb(status['RESPONSE'])
+    else:
+        bomb(status['RESPONSE'], 0)
 
 
 def main():
