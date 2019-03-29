@@ -1,61 +1,42 @@
 import os
 import sys
-import json
 import argparse
 import configparser
 from pprint import pprint
 import requests
 
-OPTS = {
-    'booleans': {
-        'actions': (
-            'alerts',
-            'datacollection',
-            'sniffer',
-            'longrunningqueries',
-            'lockedqueries'
-        ),
-        'values': (
-            'enable',
-            'disable'
-        )
-    },
-    'longquery': {
-        'actions': (
-            'longrunningqueryaction',
-        ),
-        'values': (
-            'notify',
-            'kill',
-            'notifyandkill'
-        )
-    }
+_VALUES_BOOL = ('enable', 'disable')
+_VALUES_LONG_RUNNING = ('notify', 'kill', 'notifyandkill')
+
+_ACTIONS = {
+    'alerts': _VALUES_BOOL,
+    'datacollection': _VALUES_BOOL,
+    'sniffer': _VALUES_BOOL,
+    'longrunningqueries': _VALUES_BOOL,
+    'lockedqueries': _VALUES_BOOL,
+    'longrunningqueryaction': _VALUES_LONG_RUNNING
 }
 
 
-def get_opt(s, k, d=OPTS):
-    return d[s][k]
+def get_actions(d=_ACTIONS):
+    return d.keys()
 
 
-def get_actions(s, d=OPTS):
-    return d[s]['actions']
+def get_values(a, d=_ACTIONS):
+    return d[a]
 
 
-def get_values(s, d=OPTS):
-    return d[s]['values']
-
-
-def check_action_value(s, a, v, d=OPTS):
-    if a in get_actions(s, d):
-        if v in get_values(s, d):
+def check_action_value(a, v, d=_ACTIONS):
+    if a in get_actions(d):
+        if v in get_values(a, d):
             return True
         else:
-            bomb("{} is not a valid value for {}".format(a, v))
+            return False
     else:
-        return False
+        drama("Unknown action: {}".format(a))
 
 
-def bomb(msg, x=1):
+def drama(msg, x=1):
     print(msg)
     sys.exit(x)
 
@@ -78,24 +59,21 @@ def cli_args():
         'port': str(args.port),
         'dry_run': args.dry_run}
 
-    if check_action_value('booleans', args.action, args.value, OPTS):
+    cfg['object'] = 'MONyogAPI'
+
+    if check_action_value(args.action, args.value, _ACTIONS):
         cfg['action'] = args.action
         cfg['value'] = args.value
-    elif check_action_value('longquery', args.action, args.value, OPTS):
-        cfg['action'] = args.action
-        cfg['value'] = args.value
-    else:
-        bomb("Unrecognised action and value")
 
     if args.server and args.tags:
-        bomb("Choose only one of --server or --tags")
+        drama("Choose only one of --server or --tags")
 
     if args.server:
         cfg['target'] = '_server={}'.format(args.server)
     elif args.tags:
         cfg['target'] = '_tags={}'.format(args.tags)
     else:
-        bomb("Need at least one of --server or --tags")
+        drama("Need at least one of --server or --tags")
 
     if args.password:
         cfg['password'] = str(args.password)
@@ -170,8 +148,6 @@ def monyog_cfg(cfg: dict = cli_args()):
     if cli_cfg:
         cfg.update(cli_cfg)
 
-    cfg['object'] = 'MONyogAPI'
-
     url_template = (
         "http://{host}:{port}/"
         "?_object={object}"
@@ -198,9 +174,9 @@ def monyog_cmd(cfg: dict = monyog_cfg()):
 
 def check_status(status):
     if status['STATUS'] == 'FALIURE':
-        bomb(status['RESPONSE'])
+        drama(status['RESPONSE'])
     else:
-        bomb(status['RESPONSE'], 0)
+        drama(status['RESPONSE'], 0)
 
 
 def main():
